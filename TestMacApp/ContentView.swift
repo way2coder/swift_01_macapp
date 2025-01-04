@@ -12,7 +12,10 @@ struct ContentView: View {
     @State var cardCount: Int = 4
     var body: some View {
         VStack{
-            cards
+            ScrollView{
+                cards
+            }
+            Spacer()
             cardsCountAdjusters
             
         }
@@ -40,9 +43,13 @@ struct ContentView: View {
         cardCountAdjuster(by: -1, symbol: "rectangle.stack.badge.minus.fill")
     }
     var cards: some View {
-        ForEach(0..<cardCount, id: \.self){ index in
-            CardView(content: emojis[index])
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120, maximum: 200))]){
+            ForEach(0..<cardCount, id: \.self){ index in
+                CardView(content: emojis[index])
+                    .aspectRatio(2/3, contentMode: .fit)
+            }
         }
+        
     }
     var cardAdder: some View {
         cardCountAdjuster(by: +1, symbol: "rectangle.stack.badge.plus.fill")
@@ -56,14 +63,15 @@ struct CardView: View {
     var body: some View {
         ZStack {
             let cardBase = RoundedRectangle(cornerSize: .init(width: 10, height: 10))
-            if showCard{
+            Group {
                 cardBase.fill(Color.red)
                 cardBase.strokeBorder(lineWidth: 2, antialiased: true)
                 Text(content).font(.largeTitle)
             }
-            else {
-                cardBase.fill(Color.blue)
-            }
+            .opacity(showCard ? 1 : 0)
+            
+            cardBase.fill(Color.blue).opacity(showCard ? 0 : 0.5)
+            
         }
         .onTapGesture {
             showCard.toggle()
